@@ -18,7 +18,8 @@
   --muted:#8A4A5A;--white:#FFFAFC;
 }
 html{scroll-behavior:auto}
-body{background:var(--cream);color:var(--burg);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+body{background:var(--cream);color:var(--burg);font-family:'DM Sans',sans-serif;font-weight:300;overflow-x:hidden}
+@media(hover:hover){body{cursor:none}}
 body.loading{overflow:hidden}
 
 /* LOADER */
@@ -32,8 +33,9 @@ body.loading{overflow:hidden}
 @keyframes loaderSlide{to{left:200%}}
 
 /* CURSOR */
-#cur{position:fixed;width:10px;height:10px;background:var(--rose3);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .2s,height .2s}
-#cur-r{position:fixed;width:38px;height:38px;border:1px solid rgba(212,114,138,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%)}
+#cur{position:fixed;width:10px;height:10px;background:var(--rose3);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:multiply;transition:width .2s,height .2s;display:none}
+#cur-r{position:fixed;width:38px;height:38px;border:1px solid rgba(212,114,138,0.4);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);display:none}
+@media(hover:hover){#cur{display:block}#cur-r{display:block}}
 body:has(a:hover) #cur,body:has(button:hover) #cur{width:5px;height:5px}
 body:has(a:hover) #cur-r,body:has(button:hover) #cur-r{width:58px;height:58px}
 
@@ -53,7 +55,7 @@ nav.scrolled .nav-logo{color:var(--burg)}
 nav.scrolled .nav-links a{color:var(--muted)}
 .nav-links a:hover,.nav-links a:focus{color:var(--rose)}
 nav.scrolled .nav-links a:hover{color:var(--rose3)}
-.nav-btn{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--burg);background:var(--rose);text-decoration:none;padding:.65rem 1.6rem;border-radius:30px;transition:all .25s;cursor:none;font-weight:500}
+.nav-btn{font-size:.74rem;letter-spacing:.12em;text-transform:uppercase;color:var(--burg);background:var(--rose);text-decoration:none;padding:.65rem 1.6rem;border-radius:30px;transition:all .25s;font-weight:500}
 .nav-btn:hover{background:var(--rose2);transform:translateY(-1px);box-shadow:0 6px 20px rgba(212,114,138,0.3)}
 
 /* HERO */
@@ -143,7 +145,7 @@ section{padding:8rem 2rem}
 .cta-strip{background:linear-gradient(135deg,var(--rose4) 0%,var(--rose3) 40%,var(--terra) 100%);padding:4rem 2rem;text-align:center;position:relative;overflow:hidden}
 .cta-strip::before{content:'';position:absolute;top:-50%;left:-10%;width:120%;height:200%;background:radial-gradient(ellipse,rgba(255,255,255,0.06) 0%,transparent 60%);pointer-events:none}
 .cta-strip p{font-family:'Playfair Display',serif;font-style:italic;font-size:1.5rem;color:var(--white);margin-bottom:2rem;position:relative;z-index:2}
-.btn-white{display:inline-flex;align-items:center;gap:.6rem;font-size:.8rem;letter-spacing:.13em;text-transform:uppercase;color:var(--rose3);background:var(--white);text-decoration:none;padding:1.1rem 2.8rem;border-radius:40px;font-weight:500;position:relative;overflow:hidden;transition:all .3s;cursor:none;z-index:2}
+.btn-white{display:inline-flex;align-items:center;gap:.6rem;font-size:.8rem;letter-spacing:.13em;text-transform:uppercase;color:var(--rose3);background:var(--white);text-decoration:none;padding:1.1rem 2.8rem;border-radius:40px;font-weight:500;position:relative;overflow:hidden;transition:all .3s;z-index:2}
 .btn-white::after{content:'';position:absolute;top:-50%;left:-75%;width:50%;height:200%;background:linear-gradient(90deg,transparent,rgba(212,114,138,0.25),transparent);transform:skewX(-20deg);transition:left .55s}
 .btn-white:hover::after{left:125%}
 .btn-white:hover{background:var(--blush);transform:translateY(-2px);box-shadow:0 10px 35px rgba(0,0,0,0.18)}
@@ -318,7 +320,7 @@ section{padding:8rem 2rem}
 .faq-sec{background:var(--blush)}
 .faq-list{margin-top:3.5rem}
 .fq{border-bottom:1px solid rgba(212,114,138,0.13)}
-.fq-q{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--burg);padding:1.5rem 0;cursor:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;user-select:none}
+.fq-q{font-family:'Playfair Display',serif;font-size:1rem;font-weight:600;color:var(--burg);padding:1.5rem 0;display:flex;justify-content:space-between;align-items:center;gap:1rem;user-select:none}
 .fq-icon{width:28px;height:28px;border-radius:50%;border:1px solid rgba(212,114,138,0.28);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
 .fq-icon svg{width:14px;height:14px;stroke:var(--rose3);fill:none;stroke-width:2;transition:transform .3s}
 .fq.open .fq-icon{background:var(--rose3);border-color:var(--rose3)}
@@ -580,7 +582,7 @@ footer a:hover{color:var(--rose)}
   <div class="video-wrap rs">
     <div class="video-glow"></div>
     <div class="video-frame">
-      <iframe src="https://player.vimeo.com/video/1204502665?badge=0&autopause=0&player_id=0&app_id=58479" title="Il Cerchio — heartrebirth" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen loading="lazy"></iframe>
+      <iframe src="https://player.vimeo.com/video/1204502665" title="Il Cerchio — heartrebirth" frameborder="0" allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media" allowfullscreen></iframe>
     </div>
   </div>
 </section>
