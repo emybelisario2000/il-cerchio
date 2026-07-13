@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scopri il tuo schema relazionale - Il Cerchio</title>
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+        .animate-slideIn {
+            animation: slideIn 0.6s ease-out;
+        }
+        .animate-float {
+            animation: float 3s ease-in-out infinite;
+        }
+        .twinkle {
+            animation: twinkle 2s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { createRoot } = ReactDOM;
+
+        function SchemaQuiz() {
+            const [currentQuestion, setCurrentQuestion] = useState(0);
+            const [scores, setScores] = useState({ affamata: 0, imprigionata: 0, invisibile: 0 });
+            const [showResult, setShowResult] = useState(false);
+            const [email, setEmail] = useState('');
+            const [submitted, setSubmitted] = useState(false);
+
+            const questions = [
+                {
+                    question: "Quando lui scompare per giorni, la PRIMA cosa che fai è:",
+                    answers: [
+                        { text: "Lo contatti tu, speri che risponda", schema: "affamata" },
+                        { text: "Rimani paralizzata, pensi a lui tutto il giorno", schema: "imprigionata" },
+                        { text: "Fai finta di niente, ma soffi dentro", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "Se ti promette di cambiare ma non cambia, tu:",
+                    answers: [
+                        { text: "Gli dai sempre un'altra chance, ha bisogno di tempo", schema: "affamata" },
+                        { text: "Non riesci a mollarlo, pensi che prima o poi capirà", schema: "imprigionata" },
+                        { text: "Accetti così com'è, non ti meriti di più", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "Un red flag che IGNORI sempre è:",
+                    answers: [
+                        { text: "Mi fa sentire meno sola anche se mi fa male", schema: "affamata" },
+                        { text: "Non resco a staccarmi mentalmente", schema: "imprigionata" },
+                        { text: "Penso di non avere scelta", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "Dopo una rottura, tu:",
+                    answers: [
+                        { text: "Speri che torni, rimani disponibile per lui", schema: "affamata" },
+                        { text: "Non riesci a proseguire, revivi ogni momento assieme", schema: "imprigionata" },
+                        { text: "Pensi che tanto non ero importante, serve a niente", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "Gli uomini che attiri sono:",
+                    answers: [
+                        { text: "Affascinanti ma disconnessi, mi tengono in sospeso", schema: "affamata" },
+                        { text: "Non disponibili emotivamente, ma non riesco a lasciarli", schema: "imprigionata" },
+                        { text: "Che non mi vedono, e io nemmeno mi vedo", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "Quando lui non ti scrive, pensi:",
+                    answers: [
+                        { text: "Che faccio? Come faccio a richiamare la sua attenzione?", schema: "affamata" },
+                        { text: "Che ho rovinato tutto, mi tormento", schema: "imprigionata" },
+                        { text: "Che era scontato, non mi ama comunque", schema: "invisibile" }
+                    ]
+                },
+                {
+                    question: "La tua autostima nelle relazioni è:",
+                    answers: [
+                        { text: "Dipende da lui e da quanto mi scrive", schema: "affamata" },
+                        { text: "Crolla quando lo perdo, come se fossi nulla senza lui", schema: "imprigionata" },
+                        { text: "Non ho mai creduto di meritarmi qualcosa di buono", schema: "invisibile" }
+                    ]
+                }
+            ];
+
+            const schemas = {
+                affamata: {
+                    name: "LA AFFAMATA 🌙",
+                    color: "from-rose-300 to-pink-200",
+                    description: "Rimani agganciata alle briciole, aspetti sempre il suo prossimo messaggio."
+                },
+                imprigionata: {
+                    name: "L'IMPRIGIONATA 🕊️",
+                    color: "from-violet-300 to-purple-200",
+                    description: "Non riesci a lasciar andare, rimani mentalmente legata anche dopo la rottura."
+                },
+                invisibile: {
+                    name: "L'INVISIBILE 💫",
+                    color: "from-amber-300 to-yellow-200",
+                    description: "Attrai uomini non disponibili perché non ti vedi nemmeno tu."
+                }
+            };
+
+            const getWinningSchema = () => {
+                const { affamata, imprigionata, invisibile } = scores;
+                if (affamata >= imprigionata && affamata >= invisibile) return 'affamata';
+                if (imprigionata >= invisibile) return 'imprigionata';
+                return 'invisibile';
+            };
+
+            const handleAnswer = (schema) => {
+                const newScores = { ...scores };
+                newScores[schema]++;
+                setScores(newScores);
+
+                if (currentQuestion < questions.length - 1) {
+                    setCurrentQuestion(currentQuestion + 1);
+                } else {
+                    setShowResult(true);
+                }
+            };
+
+            const handleEmailSubmit = async (e) => {
+                e.preventDefault();
+                if (email) {
+                    try {
+                        const winningSchema = getWinningSchema();
+                        const schemaMap = {
+                            'affamata': 'affamata',
+                            'imprigionata': 'imprigionata',
+                            'invisibile': 'invisibile'
+                        };
+                        
+                        const schemaValue = schemaMap[winningSchema];
+
+                        const response = await fetch('https://api.brevo.com/v3/contacts', {
+                            method: 'POST',
+                            headers: { 
+                                'api-key': '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',
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                email: email,
+                                listIds: [3],
+                                attributes: {
+                                    SCHEMA: schemaValue
+                                }
+                            })
+                        });
+
+                        if (response.ok) {
+                            console.log('Email aggiunta a Brevo');
+                            setSubmitted(true);
+                        } else {
+                            console.error('Errore Brevo:', response.status);
+                            setSubmitted(true);
+                        }
+                    } catch (err) {
+                        console.error('Errore:', err);
+                        setSubmitted(true);
+                    }
+                }
+            };
+
+            const winningSchema = getWinningSchema();
+            const result = schemas[winningSchema];
+
+            return (
+                <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 overflow-hidden relative">
+                    <div className="fixed inset-0 opacity-30">
+                        <div className="absolute top-0 left-0 w-96 h-96 bg-purple-400 rounded-full mix-blend-multiply filter blur-3xl"></div>
+                        <div className="absolute bottom-0 right-0 w-96 h-96 bg-pink-300 rounded-full mix-blend-multiply filter blur-3xl"></div>
+                    </div>
+
+                    <div className="fixed inset-0 pointer-events-none">
+                        {[...Array(15)].map((_, i) => (
+                            <div
+                                key={i}
+                                className="absolute w-1 h-1 bg-yellow-300 rounded-full twinkle"
+                                style={{
+                                    left: `${Math.random() * 100}%`,
+                                    top: `${Math.random() * 100}%`,
+                                    opacity: Math.random() * 0.6 + 0.4
+                                }}
+                            />
+                        ))}
+                    </div>
+
+                    <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
+                        <div className="w-full max-w-2xl">
+                            {currentQuestion === 0 && !showResult && (
+                                <div className="text-center animate-slideIn">
+                                    <div className="mb-8 flex justify-center">
+                                        <span className="text-6xl animate-float">✨</span>
+                                    </div>
+                                    
+                                    <h1 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight">
+                                        Quale schema relazionale hai?
+                                    </h1>
+                                    
+                                    <p className="text-xl text-purple-100 mb-8 leading-relaxed">
+                                        Scopri perché ripeti sempre lo stesso pattern con uomini non disponibili
+                                    </p>
+
+                                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 mb-8 border border-white/20">
+                                        <p className="text-purple-100 mb-6">
+                                            Questo quiz di 2 minuti ti rivela il tuo schema relazionale ricorrente e perché continui ad attrarre lo stesso tipo di uomo.
+                                        </p>
+                                        <p className="text-sm text-purple-200">
+                                            ✨ Risposte oneste, risultati chiari ✨
+                                        </p>
+                                    </div>
+
+                                    <button
+                                        onClick={() => setCurrentQuestion(1)}
+                                        className="px-8 py-4 bg-gradient-to-r from-rose-400 to-pink-400 text-white font-semibold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
+                                    >
+                                        Inizia il quiz
+                                    </button>
+                                </div>
+                            )}
+
+                            {currentQuestion > 0 && !showResult && (
+                                <div className="animate-slideIn">
+                                    <div className="mb-8">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <span className="text-purple-200 text-sm">Domanda {currentQuestion} di {questions.length}</span>
+                                            <span className="text-purple-200 text-sm">{Math.round((currentQuestion / questions.length) * 100)}%</span>
+                                        </div>
+                                        <div className="w-full bg-white/10 rounded-full h-2">
+                                            <div
+                                                className="bg-gradient-to-r from-rose-400 to-pink-400 h-2 rounded-full transition-all duration-500"
+                                                style={{ width: `${(currentQuestion / questions.length) * 100}%` }}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20">
+                                        <h2 className="text-2xl md:text-3xl font-bold text-white mb-8 leading-snug">
+                                            {questions[currentQuestion - 1].question}
+                                        </h2>
+
+                                        <div className="space-y-4">
+                                            {questions[currentQuestion - 1].answers.map((answer, idx) => (
+                                                <button
+                                                    key={idx}
+                                                    onClick={() => handleAnswer(answer.schema)}
+                                                    className="w-full text-left p-5 rounded-xl bg-white/5 hover:bg-white/15 border border-white/10 hover:border-pink-400/50 transition-all duration-300 hover:scale-102"
+                                                >
+                                                    <p className="text-white hover:text-pink-200 font-medium">
+                                                        {answer.text}
+                                                    </p>
+                                                </button>
+                                            ))}
+                                        </div>
+                                    </div>
+                                </div>
+                            )}
+
+                            {showResult && !submitted && (
+                                <div className="animate-slideIn">
+                                    <div className={`bg-gradient-to-br ${result.color} rounded-3xl p-10 shadow-2xl border border-white/20 backdrop-blur-md mb-6`}>
+                                        <div className="text-center">
+                                            <div className="text-4xl mb-4">🌙</div>
+                                            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-2">
+                                                {result.name}
+                                            </h2>
+                                            <p className="text-base text-gray-700 italic">
+                                                {result.description}
+                                            </p>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-white/10 backdrop-blur-md rounded-3xl p-8 border border-white/20 mb-6">
+                                        <div className="space-y-6">
+                                            <div className="text-center">
+                                                <p className="text-2xl md:text-3xl font-bold text-white leading-snug mb-6">
+                                                    {winningSchema === 'affamata' && "Controlli il telefono aspettando il suo messaggio. Mentre lui fa tutt'altro."}
+                                                    {winningSchema === 'imprigionata' && "Mesi dopo la rottura, ancora pensi a lui. Controlli il suo profilo sperando che cambi."}
+                                                    {winningSchema === 'invisibile' && "Attrai sempre uomini che non ti scelgono. E tu accetti così com'è."}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-4 py-6 border-y border-white/20">
+                                                {winningSchema === 'affamata' && (
+                                                    <>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Quante volte OGGI hai controllato se ti ha scritto?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ E quante volte GLI hai scritto tu?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Se il rapporto è 5:1... stai mendicando amore.
+                                                            </p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                                
+                                                {winningSchema === 'imprigionata' && (
+                                                    <>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Pensi ancora a ogni conversazione che avete avuto?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Controlli il suo profilo cercando segnali che pensa a te?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Immagini scenari dove torna e finalmente capisce il tuo valore?
+                                                            </p>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                {winningSchema === 'invisibile' && (
+                                                    <>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Quando lui non sceglie te, pensi: "Tanto non merito di più"?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Accetti comportamenti che mai accetteresti in un'amica?
+                                                            </p>
+                                                        </div>
+                                                        <div className="bg-white/5 rounded-xl p-4 hover:bg-white/10 transition">
+                                                            <p className="text-purple-100 font-medium">
+                                                                ✋ Finché non ti vedi tu, lui non ti vedrà nemmeno.
+                                                            </p>
+                                                        </div>
+                                                    </>
+                                                )}
+                                            </div>
+
+                                            <div className="text-center">
+                                                <p className="text-purple-200 text-lg font-semibold">
+                                                    Ci sono risposte concrete a queste domande.
+                                                </p>
+                                                <p className="text-rose-300 font-bold text-lg mt-2">
+                                                    E cambiano tutto.
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="bg-gradient-to-br from-rose-400/20 to-pink-400/20 backdrop-blur-md rounded-3xl p-8 border border-rose-300/30">
+                                        <form onSubmit={handleEmailSubmit} className="space-y-4">
+                                            <h3 className="text-2xl font-bold text-white text-center mb-4">
+                                                🔓 Sblocca la diagnosi completa
+                                            </h3>
+                                            
+                                            <p className="text-rose-200 text-center font-semibold mb-2">
+                                                Ricevi subito:
+                                            </p>
+                                            
+                                            <ul className="text-rose-100 space-y-2 text-center mb-6 text-sm">
+                                                <li>📊 La diagnosi COMPLETA personalizzata</li>
+                                                <li>💪 5 aree su cui lavorare davvero</li>
+                                                <li>⚡ L'esercizio pratico (quello che trasforma)</li>
+                                                <li>🎯 Perché ripeti questo schema</li>
+                                                <li>💛 Accesso anticipato alla comunità di donne che stanno uscendo dagli stessi pattern</li>
+                                            </ul>
+
+                                            <input
+                                                type="email"
+                                                value={email}
+                                                onChange={(e) => setEmail(e.target.value)}
+                                                placeholder="Metti qui la tua email"
+                                                className="w-full px-6 py-4 rounded-xl bg-white text-gray-900 placeholder-gray-500 font-medium focus:outline-none focus:ring-2 focus:ring-rose-400 text-center text-lg"
+                                                required
+                                            />
+                                            
+                                            <button
+                                                type="submit"
+                                                className="w-full px-6 py-4 bg-gradient-to-r from-rose-400 to-pink-400 text-white font-bold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300 text-lg"
+                                            >
+                                                Inviami la diagnosi completa + esercizio
+                                            </button>
+
+                                            <p className="text-xs text-rose-300/80 text-center">
+                                                Non spam. Solo una email quando Il Cerchio apre 💛
+                                            </p>
+                                        </form>
+                                    </div>
+                                </div>
+                            )}
+
+                            {submitted && (
+                                <div className="text-center animate-slideIn">
+                                    <div className="mb-8">
+                                        <span className="text-7xl animate-float">✨</span>
+                                    </div>
+
+                                    <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">
+                                        Email inviata!
+                                    </h2>
+
+                                    <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20 mb-8 space-y-6">
+                                        <div>
+                                            <p className="text-purple-100 text-lg mb-4">
+                                                Perfetto! Controlla la tua email tra pochi minuti 📧
+                                            </p>
+                                            <p className="text-purple-200 text-sm">
+                                                Ti sto inviando la diagnosi COMPLETA su <span className="font-bold text-rose-300">{result.name}</span> + l'esercizio pratico che cambia le cose.
+                                            </p>
+                                        </div>
+
+                                        <div className="bg-gradient-to-r from-rose-400 to-pink-400 rounded-2xl p-6">
+                                            <h3 className="text-white font-bold text-lg mb-4">📌 Nella tua email troverai:</h3>
+                                            <ul className="text-white space-y-3 text-left text-sm">
+                                                <li className="flex items-start gap-3">
+                                                    <span className="font-bold flex-shrink-0">✅</span>
+                                                    <span>La diagnosi COMPLETA personalizzata</span>
+                                                </li>
+                                                <li className="flex items-start gap-3">
+                                                    <span className="font-bold flex-shrink-0">✅</span>
+                                                    <span>5 aree specifiche su cui lavorare</span>
+                                                </li>
+                                                <li className="flex items-start gap-3">
+                                                    <span className="font-bold flex-shrink-0">✅</span>
+                                                    <span>L'esercizio pratico DETTAGLIATO</span>
+                                                </li>
+                                                <li className="flex items-start gap-3">
+                                                    <span className="font-bold flex-shrink-0">✅</span>
+                                                    <span>Accesso anticipato alla comunità</span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+
+                                    <div className="space-y-3">
+                                        <a
+                                            href="https://www.instagram.com/heartrebirth_/"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block px-8 py-4 bg-gradient-to-r from-rose-400 to-pink-400 text-white font-semibold rounded-full hover:shadow-2xl hover:scale-105 transition-all duration-300"
+                                        >
+                                            Seguimi su Instagram
+                                        </a>
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = createRoot(document.getElementById('root'));
+        root.render(<SchemaQuiz />);
+    </script>
+</body>
+</html>
